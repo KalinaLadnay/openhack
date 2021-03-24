@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: ACR build
         id: acr
-        uses: KalinaLadnay/openhack@main
+        uses: azure/docker-login@v1
         with:
           service_principal: ${{ secrets.service_principal }}
           service_principal_password: ${{ secrets.service_principal_password }}
