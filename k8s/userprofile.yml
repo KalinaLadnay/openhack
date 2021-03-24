@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openhack-userprofile
+  labels:
+    app: openhack-userprofile
+    sub: tripinsights
+    affinitygroup: openhack-userprofile
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: openhack-userprofile
+      sub: tripinsights
+      affinitygroup: openhack-userprofile
+  template:
+    metadata:
+      labels:
+        app: openhack-userprofile
+        sub: tripinsights
+        affinitygroup: openhack-userprofile
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: openhack-userprofile
+          image: registrypbi7366.azurecr.io/tripinsights/userprofile:1.0
+          env:
+            - name: PORT
+              value: "80"
+            - name: CONFIG_FILES_PATH
+              value: "/secrets"
+            - name: SQL_USER
+              value: "${SQL_USER}"
+            - name: SQL_PASSWORD
+              value: "${SQL_PASSWORD}"
+            - name: SQL_SERVER
+              value: "${SQL_SERVER}"
+            - name: SQL_DBNAME
+              value: "${SQL_DBNAME}"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: tmp
+              mountPath: /secrets/
+          livenessProbe:
+            httpGet:
+              path: /api/user/healthcheck
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /api/user/healthcheck
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "0.1"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1024Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openhack-userprofile
+  labels:
+    app: openhack-userprofile
+    prometheus-target: dev-metrics
+spec:
+  ports:
+    - name: api
+      port: 8080
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: openhack-userprofile
+    sub: tripinsights
