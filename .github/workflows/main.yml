@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: ACR build
         id: acr
-        uses: KalinaLAdnay/openhack@main
+        uses: KalinaLadnay/openhack@main
         with:
           service_principal: ${{ secrets.service_principal }}
           service_principal_password: ${{ secrets.service_principal_password }}
