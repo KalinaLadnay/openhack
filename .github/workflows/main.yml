@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - "src/poi/**"
-   tags:
+    tags:
       - v1.*
 jobs:
   build:
