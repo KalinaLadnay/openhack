@@ -3,6 +3,7 @@
 
 This is the POI (Points Of Interest) API for the Trip Insights service. It collects the points of the trip when a hard stop or hard acceleration was detected.
 
+
 ## Dependencies
 
 The POI (Points Of Interest) API has a dependency on a SQL Server compatible database to store the points of interest.
