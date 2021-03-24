@@ -13,12 +13,16 @@ jobs:
         id: acr
         uses: azure/docker-login@v1
         with:
-          service_principal: ${{ secrets.service_principal }}
-          service_principal_password: ${{ secrets.service_principal_password }}
-          tenant: ${{ secrets.tenant }}
-          registry: ${{ secrets.registry }}
-          repository: ${{ secrets.repository }}
-          image: poi
-          git_access_token: ${{ secrets.git_access_token }}
-          folder: src/poi
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+#          service_principal: ${{ secrets.service_principal }}
+#          service_principal_password: ${{ secrets.service_principal_password }}
+#          tenant: ${{ secrets.tenant }}
+#          registry: ${{ secrets.registry }}
+#          repository: ${{ secrets.repository }}
+#          image: poi
+#          git_access_token: ${{ secrets.git_access_token }}
+#          folder: src/poi
           dockerfile: ../../dockerfiles/Dockerfile_3
+#
