@@ -1,0 +1,113 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: openhack-tripviewer
+spec:
+  maxUnavailable: 67%
+  selector:
+    matchLabels:
+      app: openhack-tripviewer
+      sub: tripinsights
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openhack-tripviewer
+  labels:
+    app: openhack-tripviewer
+    sub: tripinsights
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 67%
+      maxUnavailable: 34%
+  selector:
+    matchLabels:
+      app: openhack-tripviewer
+      sub: tripinsights
+  template:
+    metadata:
+      labels:
+        app: openhack-tripviewer
+        sub: tripinsights
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      containers:
+        - name: openhack-tripviewer
+          image: registrypbi7366.azurecr.io/tripinsights/tripviewer:1.0
+          env:
+            - name: USERPROFILE_API_ENDPOINT
+              value: "$USERPROFILE_API_ENDPOINT"
+            - name: TRIPS_API_ENDPOINT
+              value: "$TRIPS_API_ENDPOINT"
+            - name: BING_MAPS_KEY
+              value: "$BING_MAPS_KEY"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "1024Mi"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openhack-tripviewer
+  labels:
+    app: openhack-tripviewer
+spec:
+  ports:
+    - name: tripviewer
+      port: 8080
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: openhack-tripviewer
+    sub: tripinsights
+---
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: $CI_PROJECT_NAME
+#   annotations:
+#     kubernetes.io/ingress.class: "nginx"
+#     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+# spec:
+#   rules:
+#     - host: $CI_ENVIRONMENT_URL_BASENAME
+#       http:
+#         paths:
+#           - path: /
+#             backend:
+#               serviceName: $CI_PROJECT_NAME
+#               servicePort: $APP_PORT
+#   tls:
+#     - hosts:
+#         - $CI_ENVIRONMENT_URL_BASENAME
+#       secretName: $SSL_CERT_NAME
