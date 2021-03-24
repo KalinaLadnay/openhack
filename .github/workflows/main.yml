@@ -16,6 +16,9 @@ jobs:
             login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
 #          service_principal: ${{ secrets.service_principal }}
 #          service_principal_password: ${{ secrets.service_principal_password }}
 #          tenant: ${{ secrets.tenant }}
