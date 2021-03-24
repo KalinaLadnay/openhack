@@ -3,6 +3,8 @@ on:
   push:
     paths:
       - "src/poi/**"
+   tags:
+      - v1.*
 jobs:
   build:
     runs-on: ubuntu-latest
