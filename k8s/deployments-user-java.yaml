@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openhack-user-java
+  labels:
+    app: openhack-user-java
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: openhack-user-java
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 67%
+      maxUnavailable: 34%
+  template:
+    metadata:
+      labels:
+        app: openhack-user-java
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: openstack-user-java
+          image: registrypbi7366.azurecr.io/tripinsights/user-java:1.0
+          env:
+            - name: SQL_PASSWORD
+              value: "$SQL_PASSWORD"
+            - name: SQL_SERVER
+              value: "$SQL_SERVER"
+          livenessProbe:
+            httpGet:
+              path: /api/user-java/healthcheck
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /api/user-java/healthcheck
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 3
+          ports:
+            - containerPort: 8080
+#          resources:
+#            requests:
+#              cpu: "$CPU_REQUEST"
+#              memory: "${RAM_REQUEST}Mi"
+#            limits:
+#              cpu: "$CPU_LIMIT"
+#              memory: "${RAM_LIMIT}Mi"
+          securityContext:
+            runAsUser: 999
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
