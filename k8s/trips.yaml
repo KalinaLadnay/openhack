@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openhack-trips
+  annotations:
+    kubernetes.io/change-cause: "$CI_COMMIT_SHORT_SHA /$CI_COMMIT_TAG"
+  labels:
+    app: openhack-trips
+    sub: tripinsights
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: openhack-trips
+      sub: tripinsights
+  template:
+    metadata:
+      labels:
+        app: openhack-trips
+        sub: tripinsights
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: openhack-trips
+          image: registrypbi7366.azurecr.io/tripinsights/trips:1.0
+          env:
+            - name: PORT
+              value: "80"
+            - name: SQL_PASSWORD
+              value: "$SQL_PASSWORD"
+            - name: SQL_USER
+              value: "$SQL_PASSWORD"
+            - name: SQL_SERVER
+              value: "$SQL_SERVER"
+            - name: SQL_DBNAME
+              value: "$SQL_DBNAME"
+            - name: OPENAPI_DOCS_URI
+              value: "$OPENAPI_DOCS_URI"
+            - name: DEBUG_LOGGING
+              value: "false"
+          livenessProbe:
+            httpGet:
+              path: /api/trips/healthcheck
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /api/trips/healthcheck
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 3
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "0.1"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1024Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openhack-trips
+  labels:
+    app: openhack-trips
+    prometheus-target: dev-metrics
+spec:
+  ports:
+    - name: api
+      port: 8080
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: openhack-trips
+    sub: tripinsights
