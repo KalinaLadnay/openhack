@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+            ref: main
       - name: ACR build
         id: acr
         uses: azure/docker-login@v1
