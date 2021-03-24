@@ -22,8 +22,14 @@ jobs:
             password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
             cd ./src/poi && pwd
-            docker build . -f ./../../dockerfiles/Dockerfile_3 -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/poi:${{ github.sha }}
+            docker build . -f ./../../dockerfiles/Dockerfile_3 --no-cache --build-arg IMAGE_VERSION="1.0" --build-arg IMAGE_CREATE_DATE="`date -u +"%Y-%m-%dT%H:%M:%SZ"`" --build-arg IMAGE_SOURCE_REVISION="`git rev-parse HEAD`"-t ${{ secrets.REGISTRY_LOGIN_SERVER }}/tripinsights/poi:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/poi:${{ github.sha }}
+            cd ../../src/user-java
+            docker build . -f ./../../dockerfiles/Dockerfile_3 -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/user-java:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/user-java:${{ github.sha }}
+            cd ../../src/trips
+            docker build . -f ./../../dockerfiles/Dockerfile_3 -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/trips:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/trips:${{ github.sha }}
 #          service_principal: ${{ secrets.service_principal }}
 #          service_principal_password: ${{ secrets.service_principal_password }}
 #          tenant: ${{ secrets.tenant }}
