@@ -17,7 +17,7 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-            cd src/poi
+            cd ./src/poi
             docker build -f ../../dockerfiles/Dockerfile_3 -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/poi:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/poi:${{ github.sha }}
 #          service_principal: ${{ secrets.service_principal }}
