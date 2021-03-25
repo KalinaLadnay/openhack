@@ -30,10 +30,12 @@ spec:
           env:
             - name: SQL_SERVER
               value: "${{ secrets.SQL_SERVER }}"
-            - name: SQL_USERNAME
-              value: "${{ secrets.SQL_USERNAME }}"
+            - name: SQL_USER
+              value: "${{ secrets.SQL_USER }}"
             - name: SQL_PASSWORD
               value: "${{ secrets.SQL_PASSWORD }}"
+            - name: SQL_DBNAME
+              value: "${{ secrets.SQL_DBNAME }}"
           livenessProbe:
             httpGet:
               path: /api/user-java/healthcheck
