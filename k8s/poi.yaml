@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openhack-poi
+  labels:
+    app: openhack-poi
+    sub: tripinsights
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: openhack-poi
+      sub: tripinsights
+  template:
+    metadata:
+      labels:
+        app: openhack-poi
+        sub: tripinsights
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: openhack-poi
+          image: registrypbi7366.azurecr.io/tripinsights/poi:1.0
+          env:
+            - name: SQLFQDN
+              value: "$SQL_SERVER"
+            - name: SQLUSER
+              value: "$SQL_USER"
+            - name: SQLPASS
+              value: "$SQL_PASSWORD"
+            - name: SQLDB
+              value: "$SQL_DBNAME"
+          livenessProbe:
+            httpGet:
+              path: /api/poi/healthcheck
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /api/poi/healthcheck
+              port: 80
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            failureThreshold: 3
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1024Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openhack-poi
+  labels:
+    app: openhack-poi
+    sub: tripinsights
+spec:
+  ports:
+    - name: dashboard
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: openhack-poi
+    sub: tripinsights
