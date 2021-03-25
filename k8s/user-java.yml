@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: openhack-poi
+  name: openhack-user-java
   labels:
-    app: openhack-poi
+    app: openhack-user-java
     sub: tripinsights
 spec:
   replicas: 1
@@ -14,38 +14,36 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: openhack-poi
+      app: openhack-user-java
       sub: tripinsights
   template:
     metadata:
       labels:
-        app: openhack-poi
+        app: openhack-user-java
         sub: tripinsights
     spec:
       imagePullSecrets:
         - name: regcred
       containers:
-        - name: openhack-poi
-          image: registrypbi7366.azurecr.io/tripinsights/poi:1.0
+        - name: openhack-user-java
+          image: registrypbi7366.azurecr.io/tripinsights/user-java:1.0
           env:
-            - name: SQLFQDN
+            - name: SQL_SERVER
               value: "${{ secrets.SQL_SERVER }}"
-            - name: SQLUSER
-              value: "${{ secrets.SQL_USER}}"
-            - name: SQLPASS
-              value: "${{ secrets.SQL_PASSWORD}}"
-            - name: SQLDB
-              value: "${{ secrets.SQL_DBNAME}}"
+            - name: SQL_USERNAME
+              value: "${{ secrets.SQL_USERNAME }}"
+            - name: SQL_PASSWORD
+              value: "${{ secrets.SQL_PASSWORD }}"
           livenessProbe:
             httpGet:
-              path: /api/poi/healthcheck
+              path: /api/user-java/healthcheck
               port: 80
             initialDelaySeconds: 60
             periodSeconds: 10
             failureThreshold: 10
           readinessProbe:
             httpGet:
-              path: /api/poi/healthcheck
+              path: /api/user-java/healthcheck
               port: 80
             initialDelaySeconds: 180
             periodSeconds: 10
@@ -64,9 +62,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: openhack-poi
+  name: openhack-user-java
   labels:
-    app: openhack-poi
+    app: openhack-user-java
     sub: tripinsights
 spec:
   ports:
@@ -75,5 +73,5 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    app: openhack-poi
+    app: openhack-user-java
     sub: tripinsights
