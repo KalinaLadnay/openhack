@@ -29,11 +29,11 @@ spec:
           image: registrypbi7366.azurecr.io/tripinsights/tripviewer:1.0
           env:
             - name: USERPROFILE_API_ENDPOINT
-              value: "${USERPROFILE_API_ENDPOINT}"
+              value: "${{ secrets.USERPROFILE_API_ENDPOINT }}"
             - name: TRIPS_API_ENDPOINT
-              value: "${TRIPS_API_ENDPOINT}"
+              value: "${{ secrets.TRIPS_API_ENDPOINT }}"
             - name: BING_MAPS_KEY
-              value: "${BING_MAPS_KEY}"
+              value: "${{ secrets.BING_MAPS_KEY }}"
           livenessProbe:
             httpGet:
               path: /
