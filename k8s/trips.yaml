@@ -33,15 +33,15 @@ spec:
             - name: PORT
               value: "80"
             - name: SQL_PASSWORD
-              value: "$SQL_PASSWORD"
+              value: "${{ secrets.SQL_PASSWORD }}"
             - name: SQL_USER
-              value: "$SQL_PASSWORD"
+              value: "${{ secrets.SQL_USER }}"
             - name: SQL_SERVER
-              value: "$SQL_SERVER"
+              value: "{{ secrets.$SQL_SERVER }}"
             - name: SQL_DBNAME
-              value: "$SQL_DBNAME"
+              value: "${{ secrets.SQL_DBNAME }}"
             - name: OPENAPI_DOCS_URI
-              value: "$OPENAPI_DOCS_URI"
+              value: "${{ secrets.OPENAPI_DOCS_URI }}"
             - name: DEBUG_LOGGING
               value: "false"
           livenessProbe:
